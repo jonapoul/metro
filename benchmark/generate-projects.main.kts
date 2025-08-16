@@ -471,8 +471,9 @@ anvil {
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesSubcomponent
-import dev.zacsweers.metro.ContributesGraphExtension
 import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.GraphExtension
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 $dependencyImports
@@ -691,7 +692,8 @@ interface ${className}Subcomponent {
   ${if (availableDependencies.isNotEmpty()) "// Access parent scope bindings\n$parentAccessors\n  \n" else ""}// Access subcomponent scope bindings
 $subcomponentAccessors
   
-  @ContributesGraphExtension.Factory(AppScope::class)
+  @ContributesTo(AppScope::class)
+  @GraphExtension.Factory
   interface Factory {
     fun create${className}Subcomponent(): ${className}Subcomponent
   }
@@ -1023,7 +1025,7 @@ $serviceImports
 ${generateAccessors(allModules)}
 
 @SingleIn(AppScope::class)
-@DependencyGraph(AppScope::class, isExtendable = true)
+@DependencyGraph(AppScope::class)
 interface AppComponent : ${(0 until (allModules.size / 50 + 1)).joinToString(", ") { "AccessorInterface$it" }} {
   // Multibinding accessors
   fun getAllPlugins(): Set<Plugin>

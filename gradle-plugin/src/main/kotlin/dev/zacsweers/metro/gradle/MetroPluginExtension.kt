@@ -67,13 +67,16 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
   public val generateJvmContributionHintsInFir: Property<Boolean> =
     objects.property(Boolean::class.javaObjectType).convention(false)
 
-  /**
-   * Enable/disable hint property generation for scoped inject classes. Disabled by default.
-   *
-   * @see <a href="https://zacsweers.github.io/metro/dependency-graphs/#graph-extensions">Graph
-   *   Extensions docs for more details</a>
-   */
+  @Deprecated("This is deprecated and no longer does anything. It will be removed in the future.")
   public val enableScopedInjectClassHints: Property<Boolean> =
+    objects.property(Boolean::class.javaObjectType).convention(false)
+
+  /**
+   * Enable/disable strict validation of bindings. If enabled, _all_ declared `@Provides` and
+   * `@Binds` bindings will be validated even if they are not used by the graph. Disabled by
+   * default.
+   */
+  public val enableStrictValidation: Property<Boolean> =
     objects.property(Boolean::class.javaObjectType).convention(false)
 
   /** Enable/disable shrinking of unused bindings. Enabled by default. */
@@ -160,13 +163,17 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
     public val contributesTo: SetProperty<String> = objects.setProperty(String::class.java)
     public val contributesBinding: SetProperty<String> = objects.setProperty(String::class.java)
     public val contributesIntoSet: SetProperty<String> = objects.setProperty(String::class.java)
+    @Deprecated("This is deprecated and no longer does anything. It will be removed in the future.")
     public val contributesGraphExtension: SetProperty<String> =
       objects.setProperty(String::class.java)
+    @Deprecated("This is deprecated and no longer does anything. It will be removed in the future.")
     public val contributesGraphExtensionFactory: SetProperty<String> =
       objects.setProperty(String::class.java)
     public val elementsIntoSet: SetProperty<String> = objects.setProperty(String::class.java)
-    public val graph: SetProperty<String> = objects.setProperty(String::class.java)
-    public val graphFactory: SetProperty<String> = objects.setProperty(String::class.java)
+    public val dependencyGraph: SetProperty<String> = objects.setProperty(String::class.java)
+    public val dependencyGraphFactory: SetProperty<String> = objects.setProperty(String::class.java)
+    public val graphExtension: SetProperty<String> = objects.setProperty(String::class.java)
+    public val graphExtensionFactory: SetProperty<String> = objects.setProperty(String::class.java)
     public val inject: SetProperty<String> = objects.setProperty(String::class.java)
     public val intoMap: SetProperty<String> = objects.setProperty(String::class.java)
     public val intoSet: SetProperty<String> = objects.setProperty(String::class.java)
@@ -206,8 +213,10 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
       assistedInject.add("dagger/assisted/AssistedInject")
       binds.add("dagger/Binds")
       elementsIntoSet.add("dagger/multibindings/ElementsIntoSet")
-      graph.add("dagger/Component")
-      graphFactory.add("dagger/Component.Factory")
+      dependencyGraph.add("dagger/Component")
+      dependencyGraphFactory.add("dagger/Component.Factory")
+      graphExtension.add("dagger/Subcomponent")
+      graphExtensionFactory.add("dagger/Subcomponent.Factory")
       intoMap.add("dagger/multibindings/IntoMap")
       intoSet.add("dagger/multibindings/IntoSet")
       lazy.addAll("dagger/Lazy")
@@ -237,7 +246,7 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
       qualifier.add("me/tatarka/inject/annotations/Qualifier")
       scope.add("me/tatarka/inject/annotations/Scope")
       assisted.add("me/tatarka/inject/annotations/Assisted")
-      graph.add("me/tatarka/inject/annotations/Component")
+      dependencyGraph.add("me/tatarka/inject/annotations/Component")
       intoMap.add("me/tatarka/inject/annotations/IntoMap")
       intoSet.add("me/tatarka/inject/annotations/IntoSet")
       provides.add("me/tatarka/inject/annotations/Provides")
@@ -253,22 +262,22 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
       }
       enableDaggerAnvilInterop.set(includeDaggerAnvil)
       if (includeDaggerAnvil) {
-        graph.add("com/squareup/anvil/annotations/MergeComponent")
-        graphFactory.add("com/squareup/anvil/annotations/MergeComponent.Factory")
+        dependencyGraph.add("com/squareup/anvil/annotations/MergeComponent")
+        dependencyGraphFactory.add("com/squareup/anvil/annotations/MergeComponent.Factory")
+        graphExtension.add("com/squareup/anvil/annotations/MergeSubcomponent")
+        // Anvil for Dagger doesn't have MergeSubcomponent.Factory
         contributesTo.add("com/squareup/anvil/annotations/ContributesTo")
         contributesBinding.add("com/squareup/anvil/annotations/ContributesBinding")
         contributesIntoSet.add("com/squareup/anvil/annotations/ContributesMultibinding")
-        contributesGraphExtension.add("com/squareup/anvil/annotations/ContributesSubcomponent")
+        graphExtension.add("com/squareup/anvil/annotations/ContributesSubcomponent")
         // Anvil for Dagger doesn't have ContributesSubcomponent.Factory
       }
       if (includeKotlinInjectAnvil) {
-        graph.add("software/amazon/lastmile/kotlin/inject/anvil/MergeComponent")
+        dependencyGraph.add("software/amazon/lastmile/kotlin/inject/anvil/MergeComponent")
         contributesTo.add("software/amazon/lastmile/kotlin/inject/anvil/ContributesTo")
         contributesBinding.add("software/amazon/lastmile/kotlin/inject/anvil/ContributesBinding")
-        contributesGraphExtension.add(
-          "software/amazon/lastmile/kotlin/inject/anvil/ContributesSubcomponent"
-        )
-        contributesGraphExtensionFactory.add(
+        graphExtension.add("software/amazon/lastmile/kotlin/inject/anvil/ContributesSubcomponent")
+        graphExtensionFactory.add(
           "software/amazon/lastmile/kotlin/inject/anvil/ContributesSubcomponent.Factory"
         )
       }

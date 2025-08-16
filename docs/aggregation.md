@@ -243,6 +243,24 @@ object FakeNetworkBindings {
 }
 ```
 
+### Replacing Contributed Bindings
+
+Binding containers can replace other contributed bindings, too:
+
+```kotlin
+// In production
+@ContributesBinding(AppScope::class)
+@Inject
+class HttpClientImpl : HttpClient
+
+// In tests
+@ContributesTo(AppScope::class, replaces = [HttpClientImpl::class])
+@BindingContainer
+object FakeNetworkBindings {
+  @Provides fun provideFakeHttpClient(): HttpClient = FakeHttpClient()
+}
+```
+
 ### Excluding Contributed Binding Containers
 
 Graphs can exclude specific contributed binding containers:
@@ -259,15 +277,6 @@ interface TestAppGraph {
   // NetworkBindings will not be included
 }
 ```
-
-!!! info
-    Currently, contributed binding containers cannot replace non-contributed-container types (i.e. `@ContributesBinding` classes) yet.
-
-## `@ContributesGraphExtension`
-
-`@ContributesGraphExtension` is a specialized type of graph that is _contributed_ to some parent scope. Its generation is deferred until the parent graph interface is merged.
-
-See [Dependency Graphs](dependency-graphs.md#contributed-graph-extensions) for motivation and documentation.
 
 ## Implementation notes
 

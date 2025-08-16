@@ -10,17 +10,17 @@ object LowRankImpl : ContributedInterface
 @ContributesBinding(AppScope::class, rank = 100)
 object HighRankImpl : ContributedInterface
 
-@ContributesGraphExtension(AppScope::class)
+@GraphExtension(AppScope::class)
 interface ExampleGraphExtension {
   val contributedInterface: ContributedInterface
 
-  @ContributesGraphExtension.Factory(Unit::class)
+  @GraphExtension.Factory @ContributesTo(Unit::class)
   interface Factory {
     fun createExampleGraphExtension(): ExampleGraphExtension
   }
 }
 
-@DependencyGraph(Unit::class, isExtendable = true)
+@DependencyGraph(Unit::class)
 interface UnitGraph
 
 fun box(): String {

@@ -12,6 +12,7 @@ import dev.zacsweers.metro.compiler.ir.parameters.Parameter
 import dev.zacsweers.metro.compiler.ir.parameters.Parameters
 import dev.zacsweers.metro.compiler.isWordPrefixRegex
 import dev.zacsweers.metro.compiler.render
+import dev.zacsweers.metro.compiler.reportCompilerBug
 import dev.zacsweers.metro.compiler.unsafeLazy
 import java.util.TreeSet
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -45,6 +46,13 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
   val nameHint: String
   override val contextualTypeKey: IrContextualTypeKey
   val reportableDeclaration: IrDeclarationWithName?
+
+  /**
+   * Returns true if this binding should be scoped (cached) in the graph.
+   * For most bindings, this is true if [scope] != null.
+   * For [GraphExtension] bindings, this is true if [GraphExtension.extensionScopes] is not empty.
+   */
+  fun isScoped(): Boolean = scope != null
 
   override fun renderLocationDiagnostic(): String {
     // First check if we have the contributing file and line number
@@ -153,13 +161,16 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
     }
   }
 
+  /** A binding that is statically defined in a graph or binding container. */
+  sealed interface StaticBinding : IrBinding, BindingWithAnnotations
+
   @Poko
   class Provided(
     @Poko.Skip val providerFactory: ProviderFactory,
     override val annotations: MetroAnnotations<IrAnnotation>,
     override val contextualTypeKey: IrContextualTypeKey,
     override val parameters: Parameters,
-  ) : IrBinding, BindingWithAnnotations {
+  ) : StaticBinding {
     override val dependencies: List<IrContextualTypeKey> by unsafeLazy {
       parameters.allParameters.map { it.contextualTypeKey }
     }
@@ -227,10 +238,12 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
   class Alias(
     override val typeKey: IrTypeKey,
     val aliasedType: IrTypeKey,
-    @Poko.Skip val ir: IrSimpleFunction?,
+    val bindsCallable: BindsCallable?,
     override val parameters: Parameters,
-    override val annotations: MetroAnnotations<IrAnnotation>,
-  ) : IrBinding, BindingWithAnnotations {
+  ) : StaticBinding {
+    val ir = bindsCallable?.function
+    override val annotations: MetroAnnotations<IrAnnotation> =
+      bindsCallable?.callableMetadata?.annotations ?: MetroAnnotations.none()
 
     init {
       if (ir != null && !annotations.isBinds) {
@@ -289,7 +302,7 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
           }
         }
       }
-      return super<IrBinding>.renderLocationDiagnostic()
+      return super<StaticBinding>.renderLocationDiagnostic()
     }
 
     override fun toString() = buildString {
@@ -449,7 +462,7 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
 
     fun addSourceBinding(source: IrTypeKey) {
       if (source in sourceBindings) {
-        error("Duplicate multibinding source: $source. This is a bug in the compiler.")
+        reportCompilerBug("Duplicate multibinding source: $source")
       }
       sourceBindings.add(source)
     }
@@ -536,5 +549,34 @@ internal sealed interface IrBinding : BaseBinding<IrType, IrTypeKey, IrContextua
     override val scope: IrAnnotation? = null
 
     override val nameHint: String = "${typeKey.type.rawType().name}MembersInjector"
+  }
+
+  /**
+   * Represents a graph extension binding. Graph extensions are treated as bindings to enable
+   * standard code generation for scoped instances when the extension graph itself is scoped.
+   */
+  @Poko
+  class GraphExtension(
+    override val typeKey: IrTypeKey,
+    val accessor: IrSimpleFunction,
+    val extensionScopes: Set<IrAnnotation>,
+  ) : IrBinding {
+    override val reportableDeclaration: IrDeclarationWithName = accessor
+    override val contextualTypeKey: IrContextualTypeKey = IrContextualTypeKey(typeKey)
+    override val dependencies: List<IrContextualTypeKey> = emptyList()
+    override val parameters: Parameters = Parameters.empty()
+    override val parametersByKey: Map<IrTypeKey, Parameter> = emptyMap()
+
+    // The scope field always returns null for GraphExtension
+    // Use shouldBeScoped to check if this binding needs to be scoped
+    override val scope: IrAnnotation? = null
+
+    override val nameHint: String = typeKey.type.rawType().name.asString()
+
+    /**
+     * Returns true if this graph extension should be scoped (cached) in the parent graph.
+     * A graph extension is scoped if it has any extension scopes defined.
+     */
+    override fun isScoped(): Boolean = extensionScopes.isNotEmpty()
   }
 }

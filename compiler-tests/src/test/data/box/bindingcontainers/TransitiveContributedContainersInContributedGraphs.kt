@@ -9,7 +9,7 @@ interface IncludedBindings {
   @Binds val String.bindCharSequence: CharSequence
 }
 
-@ContributesGraphExtension(AppScope::class)
+@GraphExtension(AppScope::class)
 interface ContributedGraph {
   val number: Number
   val charSequence: CharSequence
@@ -18,13 +18,13 @@ interface ContributedGraph {
 
   @Provides fun provideInt(): Int = 3
 
-  @ContributesGraphExtension.Factory(Unit::class)
+  @GraphExtension.Factory @ContributesTo(Unit::class)
   interface Factory {
     fun createContributedGraph(): ContributedGraph
   }
 }
 
-@DependencyGraph(Unit::class, isExtendable = true) interface UnitGraph
+@DependencyGraph(Unit::class) interface UnitGraph
 
 fun box(): String {
   val graph = createGraph<UnitGraph>().createContributedGraph()
