@@ -1105,6 +1105,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
       }
 
       @Test
+      @TestMetadata("AssistedDaggerFactoryClassGeneratedByAnvil.kt")
+      public void testAssistedDaggerFactoryClassGeneratedByAnvil() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/AssistedDaggerFactoryClassGeneratedByAnvil.kt");
+      }
+
+      @Test
       @TestMetadata("AssistedDaggerFactoryClassWithDifferentInputs.kt")
       public void testAssistedDaggerFactoryClassWithDifferentInputs() {
         runTest("compiler-tests/src/test/data/box/interop/dagger/AssistedDaggerFactoryClassWithDifferentInputs.kt");
@@ -1264,6 +1270,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
       @TestMetadata("QualifiersFromDaggerProviderParamsAreCarried.kt")
       public void testQualifiersFromDaggerProviderParamsAreCarried() {
         runTest("compiler-tests/src/test/data/box/interop/dagger/QualifiersFromDaggerProviderParamsAreCarried.kt");
+      }
+
+      @Test
+      @TestMetadata("ZeroArgConstructorInjectionGeneratedByAnvil.kt")
+      public void testZeroArgConstructorInjectionGeneratedByAnvil() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/ZeroArgConstructorInjectionGeneratedByAnvil.kt");
       }
 
       @Nested
