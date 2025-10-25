@@ -1267,6 +1267,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
       }
 
       @Test
+      @TestMetadata("QualifiersFromDaggerMemberInjectorCanBeLoaded.kt")
+      public void testQualifiersFromDaggerMemberInjectorCanBeLoaded() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/QualifiersFromDaggerMemberInjectorCanBeLoaded.kt");
+      }
+
+      @Test
+      @TestMetadata("QualifiersFromDaggerMemberInjectorCanBeLoadedFromKotlin.kt")
+      public void testQualifiersFromDaggerMemberInjectorCanBeLoadedFromKotlin() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/QualifiersFromDaggerMemberInjectorCanBeLoadedFromKotlin.kt");
+      }
+
+      @Test
       @TestMetadata("QualifiersFromDaggerProviderParamsAreCarried.kt")
       public void testQualifiersFromDaggerProviderParamsAreCarried() {
         runTest("compiler-tests/src/test/data/box/interop/dagger/QualifiersFromDaggerProviderParamsAreCarried.kt");
