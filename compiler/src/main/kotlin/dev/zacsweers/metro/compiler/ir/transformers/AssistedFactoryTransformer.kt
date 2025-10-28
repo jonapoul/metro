@@ -25,6 +25,7 @@ import dev.zacsweers.metro.compiler.ir.parameters.Parameter.AssistedParameterKey
 import dev.zacsweers.metro.compiler.ir.parameters.parameters
 import dev.zacsweers.metro.compiler.ir.rawType
 import dev.zacsweers.metro.compiler.ir.regularParameters
+import dev.zacsweers.metro.compiler.ir.remapTypes
 import dev.zacsweers.metro.compiler.ir.reportCompat
 import dev.zacsweers.metro.compiler.ir.requireStaticIshDeclarationContainer
 import dev.zacsweers.metro.compiler.ir.setDispatchReceiver

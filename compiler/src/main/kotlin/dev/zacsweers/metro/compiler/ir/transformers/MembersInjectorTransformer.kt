@@ -15,7 +15,6 @@ import dev.zacsweers.metro.compiler.ir.IrMetroContext
 import dev.zacsweers.metro.compiler.ir.IrTypeKey
 import dev.zacsweers.metro.compiler.ir.asContextualTypeKey
 import dev.zacsweers.metro.compiler.ir.assignConstructorParamsToFields
-import dev.zacsweers.metro.compiler.ir.buildAnnotation
 import dev.zacsweers.metro.compiler.ir.createIrBuilder
 import dev.zacsweers.metro.compiler.ir.declaredCallableMembers
 import dev.zacsweers.metro.compiler.ir.finalizeFakeOverride
@@ -32,6 +31,7 @@ import dev.zacsweers.metro.compiler.ir.parameters.Parameter
 import dev.zacsweers.metro.compiler.ir.parameters.Parameters
 import dev.zacsweers.metro.compiler.ir.parameters.memberInjectParameters
 import dev.zacsweers.metro.compiler.ir.parameters.parameters
+import dev.zacsweers.metro.compiler.ir.parameters.remapTypes
 import dev.zacsweers.metro.compiler.ir.parameters.wrapInMembersInjector
 import dev.zacsweers.metro.compiler.ir.parametersAsProviderArguments
 import dev.zacsweers.metro.compiler.ir.qualifierAnnotation
@@ -42,7 +42,6 @@ import dev.zacsweers.metro.compiler.ir.requireSimpleFunction
 import dev.zacsweers.metro.compiler.ir.requireStaticIshDeclarationContainer
 import dev.zacsweers.metro.compiler.ir.thisReceiverOrFail
 import dev.zacsweers.metro.compiler.ir.trackFunctionCall
-import dev.zacsweers.metro.compiler.ir.typeRemapperFor
 import dev.zacsweers.metro.compiler.memoize
 import dev.zacsweers.metro.compiler.memoized
 import dev.zacsweers.metro.compiler.newName
@@ -59,7 +58,6 @@ import org.jetbrains.kotlin.ir.builders.irSetField
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrTypeParametersContainer
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
@@ -94,46 +92,10 @@ internal class MembersInjectorTransformer(context: IrMetroContext) : IrMetroCont
     val declaredInjectFunctions: Map<IrSimpleFunction, Parameters>,
     val isDagger: Boolean,
   ) {
-    context(context: IrMetroContext)
     fun mergedParameters(remapper: TypeRemapper): Parameters {
       // $$MembersInjector -> origin class
-      val classTypeParams = sourceClass.typeParameters.associateBy { it.name }
       val allParams =
-        declaredInjectFunctions.map { (function, _) ->
-          // Need a composite remapper
-          // 1. Once to remap function type args -> substituted/matching parent class params
-          // 2. The custom remapper we're receiving that uses parent class params
-          val substitutionMap =
-            function.typeParameters.associate {
-              it.symbol to classTypeParams.getValue(it.name).defaultType
-            }
-          val typeParamRemapper = typeRemapperFor(substitutionMap)
-          val compositeRemapper =
-            object : TypeRemapper {
-              override fun enterScope(irTypeParametersContainer: IrTypeParametersContainer) {}
-
-              override fun leaveScope() {}
-
-              override fun remapType(type: IrType): IrType {
-                return remapper.remapType(typeParamRemapper.remapType(type))
-              }
-            }
-
-          // In metro-generated injectors, we annotate the instance param with `@Assisted`
-          // so for dagger interop, we transform the matching function to have the same annotation
-          // for logic reuse
-          val toUse =
-            if (isDagger) {
-              function.deepCopyWithSymbols(function.parent).apply {
-                regularParameters[0].annotations +=
-                  buildAnnotation(symbol, context.metroSymbols.assistedConstructor)
-              }
-            } else {
-              function
-            }
-
-          toUse.parameters(compositeRemapper)
-        }
+        declaredInjectFunctions.map { (_, parameters) -> parameters.remapTypes(remapper) }
       return when (allParams.size) {
         0 -> Parameters.empty()
         1 -> allParams.first()

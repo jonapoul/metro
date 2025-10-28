@@ -765,8 +765,7 @@ internal class BindingGraphGenerator(
                 .map { generatedInjector ->
                   // Create a remapper for the target class type parameters
                   val remapper = targetClass.deepRemapperFor(paramType)
-                  val params = generatedInjector.mergedParameters(remapper)
-                  params.ir?.parameters(remapper) ?: params
+                  generatedInjector.mergedParameters(remapper)
                 }
                 .reduce { current, next -> current.mergeValueParametersWith(next) }
             }
@@ -782,6 +781,9 @@ internal class BindingGraphGenerator(
             isFromInjectorFunction = true,
             targetClassId = targetClass.classIdOrFail,
           )
+
+        // Cache in BindingLookup to avoid re-creating it later
+        bindingLookup.putBinding(binding)
 
         graph.addBinding(contextKey.typeKey, binding, bindingStack)
 

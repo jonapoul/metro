@@ -24,7 +24,7 @@ import dev.zacsweers.metro.compiler.ir.irGetProperty
 import dev.zacsweers.metro.compiler.ir.irInvoke
 import dev.zacsweers.metro.compiler.ir.metroGraphOrFail
 import dev.zacsweers.metro.compiler.ir.metroMetadata
-import dev.zacsweers.metro.compiler.ir.parameters.parameters
+import dev.zacsweers.metro.compiler.ir.parameters.remapTypes
 import dev.zacsweers.metro.compiler.ir.parameters.wrapInProvider
 import dev.zacsweers.metro.compiler.ir.rawType
 import dev.zacsweers.metro.compiler.ir.regularParameters
@@ -745,8 +745,8 @@ internal class IrGraphGenerator(
               for ((function, unmappedParams) in generatedInjector.declaredInjectFunctions) {
                 val parameters =
                   if (typeKey.hasTypeArgs) {
-                    val remapper = function.typeRemapperFor(wrappedType.type)
-                    function.parameters(remapper)
+                    val remapper = clazz.typeRemapperFor(wrappedType.type)
+                    unmappedParams.remapTypes(remapper)
                   } else {
                     unmappedParams
                   }
@@ -754,12 +754,12 @@ internal class IrGraphGenerator(
                 trackFunctionCall(this@apply, function)
                 +irInvoke(
                   callee = function.symbol,
+                  typeArgs =
+                    targetParam.type.requireSimpleType(targetParam).arguments.map { it.typeOrFail },
                   args =
                     buildList {
                       add(irGet(targetParam))
-                      // Always drop the first parameter when calling inject, as the first is the
-                      // instance param
-                      for (parameter in parameters.regularParameters.drop(1)) {
+                      for (parameter in parameters.regularParameters) {
                         val paramBinding = bindingGraph.requireBinding(parameter.contextualTypeKey)
                         add(
                           typeAsProviderArgument(
