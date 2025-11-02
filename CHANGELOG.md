@@ -26,8 +26,7 @@ _2025-11-02_
 - [docs] Add compatibility docs: https://zacsweers.github.io/metro/latest/compatibility/. Metro supports a moving range of Kotlin versions, this page captures the tested versions for each release.
 - [docs] Add stability docs: https://zacsweers.github.io/metro/latest/stability/
 
-Special thanks to [@jonamireh](https://github.com/jonamireh), [@hossain-khan](https://github.com/hossain-khan),
-and [@l2hyunwoo](https://github.com/l2hyunwoo) for contributing to this release!
+Special thanks to [@jonamireh](https://github.com/jonamireh), [@hossain-khan](https://github.com/hossain-khan), and [@l2hyunwoo](https://github.com/l2hyunwoo) for contributing to this release!
 
 0.7.2
 -----
