@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Transform `INSTANCE` access types for `GraphDependency` bindings.
+
 0.7.3
 -----
 

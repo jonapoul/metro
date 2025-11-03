@@ -442,33 +442,34 @@ private constructor(
 
         is IrBinding.GraphDependency -> {
           val ownerKey = binding.ownerKey
-          if (binding.propertyAccess != null) {
-            // Just get the property
-            irGetProperty(
-              irGet(binding.propertyAccess.receiverParameter),
-              binding.propertyAccess.property,
-            )
-          } else if (binding.getter != null) {
-            val graphInstanceProperty =
-              bindingPropertyContext.instanceProperty(ownerKey)
-                ?: reportCompilerBug(
-                  "No matching included type instance found for type $ownerKey while processing ${node.typeKey}. Available instance fields ${bindingPropertyContext.availableInstanceKeys}"
+          val bindingGetter =
+            if (binding.propertyAccess != null) {
+              // Just get the property
+              irGetProperty(
+                irGet(binding.propertyAccess.receiverParameter),
+                binding.propertyAccess.property,
+              )
+            } else if (binding.getter != null) {
+              val graphInstanceProperty =
+                bindingPropertyContext.instanceProperty(ownerKey)
+                  ?: reportCompilerBug(
+                    "No matching included type instance found for type $ownerKey while processing ${node.typeKey}. Available instance fields ${bindingPropertyContext.availableInstanceKeys}"
+                  )
+
+              val getterContextKey = IrContextualTypeKey.from(binding.getter)
+
+              val invokeGetter =
+                irInvoke(
+                  dispatchReceiver = irGetProperty(irGet(thisReceiver), graphInstanceProperty),
+                  callee = binding.getter.symbol,
+                  typeHint = binding.typeKey.type,
                 )
 
-            val getterContextKey = IrContextualTypeKey.from(binding.getter)
-
-            val invokeGetter =
-              irInvoke(
-                dispatchReceiver = irGetProperty(irGet(thisReceiver), graphInstanceProperty),
-                callee = binding.getter.symbol,
-                typeHint = binding.typeKey.type,
-              )
-
-            if (getterContextKey.isWrappedInProvider) {
-              // It's already a provider
-              invokeGetter
-            } else {
-              wrapInProviderFunction(binding.typeKey.type) {
+              if (getterContextKey.isWrappedInProvider) {
+                // It's already a provider
+                invokeGetter
+              } else {
+                wrapInProviderFunction(binding.typeKey.type) {
                   if (getterContextKey.isWrappedInProvider) {
                     irInvoke(invokeGetter, callee = metroSymbols.providerInvoke)
                   } else if (getterContextKey.isWrappedInLazy) {
@@ -477,11 +478,15 @@ private constructor(
                     invokeGetter
                   }
                 }
-                .transformAccessIfNeeded(accessType, AccessType.PROVIDER, binding.typeKey.type)
+              }
+            } else {
+              reportCompilerBug("Unknown graph dependency type")
             }
-          } else {
-            reportCompilerBug("Unknown graph dependency type")
-          }
+          bindingGetter.transformAccessIfNeeded(
+            accessType,
+            AccessType.PROVIDER,
+            binding.typeKey.type,
+          )
         }
       }
     }

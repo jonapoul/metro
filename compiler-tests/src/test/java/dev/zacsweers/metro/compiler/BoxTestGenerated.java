@@ -1261,6 +1261,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
       }
 
       @Test
+      @TestMetadata("OptionalInNestedGraphExtensionCanBeLoaded.kt")
+      public void testOptionalInNestedGraphExtensionCanBeLoaded() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/OptionalInNestedGraphExtensionCanBeLoaded.kt");
+      }
+
+      @Test
       @TestMetadata("QualifiedDaggerFactoryClassCanBeLoaded.kt")
       public void testQualifiedDaggerFactoryClassCanBeLoaded() {
         runTest("compiler-tests/src/test/data/box/interop/dagger/QualifiedDaggerFactoryClassCanBeLoaded.kt");
