@@ -13,6 +13,9 @@ _2025-11-04_
 - **Fix**: Support more than 32 accessors in Graphs.
 - **Fix**: Transform `INSTANCE` access types for `GraphDependency` bindings.
 - **Fix**: Fix ordering of setter member injection parameters when reading injectors across modules.
+- [change] When generating reports, create directory structures matching packages rather than generating all to one top-level dir.
+
+Special thanks to [@jonamireh](https://github.com/jonamireh), [@kevinguitar](https://github.com/kevinguitar), and [@JoelWilcox](https://github.com/JoelWilcox) for contributing to this release!
 
 0.7.3
 -----
