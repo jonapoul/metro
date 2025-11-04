@@ -1315,6 +1315,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
       }
 
       @Test
+      @TestMetadata("ScopedProvidesProviderCanBeLoaded.kt")
+      public void testScopedProvidesProviderCanBeLoaded() {
+        runTest("compiler-tests/src/test/data/box/interop/dagger/ScopedProvidesProviderCanBeLoaded.kt");
+      }
+
+      @Test
       @TestMetadata("ZeroArgConstructorInjectionGeneratedByAnvil.kt")
       public void testZeroArgConstructorInjectionGeneratedByAnvil() {
         runTest("compiler-tests/src/test/data/box/interop/dagger/ZeroArgConstructorInjectionGeneratedByAnvil.kt");
