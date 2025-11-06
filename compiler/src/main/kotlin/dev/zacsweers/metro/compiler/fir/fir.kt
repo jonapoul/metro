@@ -10,6 +10,7 @@ import dev.zacsweers.metro.compiler.isPlatformType
 import dev.zacsweers.metro.compiler.mapToArray
 import dev.zacsweers.metro.compiler.memoized
 import dev.zacsweers.metro.compiler.reportCompilerBug
+import dev.zacsweers.metro.compiler.symbols.GuiceSymbols
 import dev.zacsweers.metro.compiler.symbols.Symbols
 import java.util.Objects
 import org.jetbrains.kotlin.GeneratedDeclarationKey
@@ -662,6 +663,10 @@ internal fun List<FirAnnotation>.qualifierAnnotation(
 ): MetroFirAnnotation? =
   asSequence()
     .annotationAnnotatedWithAny(session, session.classIds.qualifierAnnotations, typeResolver)
+    ?.takeIf {
+      // Guice's `@Assisted` annoyingly annotates itself as a qualifier too, so we catch that here
+      it.fir.toAnnotationClassIdSafe(session) != GuiceSymbols.ClassIds.assisted
+    }
 
 internal fun FirBasedSymbol<*>.mapKeyAnnotation(session: FirSession): MetroFirAnnotation? =
   resolvedCompilerAnnotationsWithClassIds.mapKeyAnnotation(session)

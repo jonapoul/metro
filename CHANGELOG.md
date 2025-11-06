@@ -4,7 +4,10 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Add Guice interop. This is largely limited to annotations reuse and Guice's `Provider` type.
+- **Enhancement**: Improve IR caching layer with supertype caching.
 - **Fix**: Don't treat `l` as an illegal char in name allocating. This was supposed to be `;`.
+- Split `javax` and `jakarta` interop APIs into separate artifacts from dagger for reuse.
 
 0.7.4
 -----
