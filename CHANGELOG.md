@@ -4,7 +4,12 @@ Changelog
 **Unreleased**
 --------------
 
-- **New**: Add Guice interop. This is largely limited to annotations reuse and Guice's `Provider` type.
+- **New**: Add Guice interop. This is largely focused on Guice's `Provider` type plus existing interop with jakarta.inject annotations.
+    ```kotlin
+    metro {
+      includeGuice()
+    }
+    ```
 - **Enhancement**: Improve IR caching layer with supertype caching.
 - **Fix**: Don't treat `l` as an illegal char in name allocating. This was supposed to be `;`.
 - Split `javax` and `jakarta` interop APIs into separate artifacts from dagger for reuse.
