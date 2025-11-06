@@ -711,6 +711,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
       }
 
       @Test
+      @TestMetadata("FactoryCanBeInjectedInProvider.kt")
+      public void testFactoryCanBeInjectedInProvider() {
+        runTest("compiler-tests/src/test/data/box/dependencygraph/extensions/FactoryCanBeInjectedInProvider.kt");
+      }
+
+      @Test
       @TestMetadata("FactoryIncludedBindingContainerInstancesPlumbDown.kt")
       public void testFactoryIncludedBindingContainerInstancesPlumbDown() {
         runTest("compiler-tests/src/test/data/box/dependencygraph/extensions/FactoryIncludedBindingContainerInstancesPlumbDown.kt");
