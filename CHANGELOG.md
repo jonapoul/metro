@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **Fix**: Fix diagnostic when an `@Multibinds`-annotated Map uses an enum as a key.
+
 0.7.5
 -----
 

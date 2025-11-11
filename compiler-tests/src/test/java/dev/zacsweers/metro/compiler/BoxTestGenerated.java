@@ -1450,6 +1450,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     public void testMultibindingGraphWithWithScopedMapProviderDeps() {
       runTest("compiler-tests/src/test/data/box/multibindings/MultibindingGraphWithWithScopedMapProviderDeps.kt");
     }
+
+    @Test
+    @TestMetadata("PrimeMultibindingMapEnumKey.kt")
+    public void testPrimeMultibindingMapEnumKey() {
+      runTest("compiler-tests/src/test/data/box/multibindings/PrimeMultibindingMapEnumKey.kt");
+    }
   }
 
   @Nested
