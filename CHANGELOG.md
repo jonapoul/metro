@@ -9,6 +9,7 @@ Changelog
 - **Fix**: Fix diagnostic when an `@Multibinds`-annotated Map uses an enum as a key.
 - **Fix**: Fix Dagger interop error messages when validating `@Module`s with constructor-injected fields to match errors for `@BindingContainer`s.
 - **Fix**: Catch `IrErrorType` error types earlier when generating missing binding hints.
+- **Fix**: Fix IC edge case when restoring a deleted contributed binding container.
 
 0.7.5
 -----
