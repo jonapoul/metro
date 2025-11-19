@@ -201,7 +201,7 @@ subprojects {
       apply(plugin = "org.jetbrains.dokka")
     }
     configure<MavenPublishBaseExtension> {
-      publishToMavenCentral(automaticRelease = true, validateDeployment = true)
+      publishToMavenCentral(automaticRelease = true, validateDeployment = false)
     }
 
     // configuration required to produce unique META-INF/*.kotlin_module file names
