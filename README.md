@@ -73,7 +73,6 @@ val repository = graph.repository
 | [Scopes](https://zacsweers.github.io/metro/latest/scopes/)                       | Scoping and lifecycle management               |
 | [Aggregation](https://zacsweers.github.io/metro/latest/aggregation/)             | Anvil-style contributions across modules       |
 | [Interop](https://zacsweers.github.io/metro/latest/interop/)                     | Dagger, kotlin-inject, and Guice compatibility |
-| [Multiplatform](https://zacsweers.github.io/metro/latest/multiplatform/)         | Cross-platform support                         |
 | [Performance](https://zacsweers.github.io/metro/latest/performance/)             | Build and runtime performance                  |
 | [Compatibility](https://zacsweers.github.io/metro/latest/compatibility/)         | Supported Kotlin versions                      |
 | [FAQ](https://zacsweers.github.io/metro/latest/faq/)                             | Frequently asked questions                     |
@@ -85,7 +84,7 @@ val repository = graph.repository
 
 Metro supports JVM, JS, and Native targets. The compiler plugin works with all Kotlin Multiplatform project types.
 
-See the [compatibility docs](https://zacsweers.github.io/metro/latest/compatibility/) for supported Kotlin versions.
+See the [multiplatform docs](https://zacsweers.github.io/metro/latest/multiplatform/) for supported Kotlin versions.
 
 ---
 
