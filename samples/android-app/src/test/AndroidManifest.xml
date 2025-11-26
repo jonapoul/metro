@@ -12,13 +12,13 @@
     android:theme="@style/Theme.Material3.DayNight"
   >
     <activity
-      android:name=".MainActivity"
+      android:name=".MetroAppComponentFactoryTest$TestActivity"
       android:exported="true"
       tools:ignore="Instantiatable">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
-        <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter>
     </activity>
+    <service android:name=".MetroAppComponentFactoryTest$TestService"/>
+    <receiver android:name=".MetroAppComponentFactoryTest$TestReceiver"/>
+    <provider android:authorities="dev.zacsweers.metro.test.MyProvider"
+              android:name=".MetroAppComponentFactoryTest$TestProvider"/>
   </application>
 </manifest>
