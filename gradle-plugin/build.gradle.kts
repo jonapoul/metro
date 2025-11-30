@@ -3,7 +3,6 @@
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import java.util.Locale
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
@@ -37,7 +36,7 @@ buildConfig {
   val supportedVersions =
     fileTree(compilerCompatDir) { include("k*/version.txt") }
       .elements
-      .map { files -> files.map { it.asFile.readText().trim().lowercase(Locale.US) }.sorted() }
+      .map { files -> files.map { it.asFile.readText().trim() }.sorted() }
   buildConfigField(
     "List<String>",
     "SUPPORTED_KOTLIN_VERSIONS",

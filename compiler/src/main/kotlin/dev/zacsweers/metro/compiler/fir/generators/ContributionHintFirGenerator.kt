@@ -8,6 +8,7 @@ import dev.zacsweers.metro.compiler.fir.MetroFirTypeResolver
 import dev.zacsweers.metro.compiler.fir.annotationsIn
 import dev.zacsweers.metro.compiler.fir.classIds
 import dev.zacsweers.metro.compiler.fir.constructType
+import dev.zacsweers.metro.compiler.fir.markAsDeprecatedHidden
 import dev.zacsweers.metro.compiler.fir.memoizedAllSessionsSequence
 import dev.zacsweers.metro.compiler.fir.metroFirBuiltIns
 import dev.zacsweers.metro.compiler.fir.predicates
@@ -54,7 +55,7 @@ internal class ContributionHintFirGenerator(session: FirSession, compatContext: 
 
   private fun shouldGenerateHints(): Boolean {
     val options = session.metroFirBuiltIns.options
-    val jvmHintsEnabled = options.generateJvmContributionHintsInFir
+    val jvmHintsEnabled = options.generateContributionHintsInFir
     // Only generate hints for non-JVM/Android platforms by default
     val shouldGenerateHints = jvmHintsEnabled || !platform.isJvm()
     return shouldGenerateHints
@@ -142,6 +143,7 @@ internal class ContributionHintFirGenerator(session: FirSession, compatContext: 
           ) {
             valueParameter(Symbols.Names.contributed, { contributingClass.constructType(it) })
           }
+          .apply { markAsDeprecatedHidden(session) }
           .symbol
       }
   }

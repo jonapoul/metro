@@ -10,11 +10,18 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.tooling.core.KotlinToolingVersion
 
 @MetroExtensionMarker
 public abstract class MetroPluginExtension
 @Inject
-constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFactory) {
+constructor(
+  baseKotlinVersion: KotlinToolingVersion,
+  layout: ProjectLayout,
+  objects: ObjectFactory,
+  providers: ProviderFactory,
+) {
 
   public val interop: InteropHandler = objects.newInstance(InteropHandler::class.java)
 
@@ -49,9 +56,15 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
    * Enables whether the Metro compiler plugin can inject top-level functions. See the kdoc on
    * `Inject` for more details.
    *
-   * Be extra careful with this API, as top-level function injection is not compatible with
-   * incremental compilation!
+   * **Warnings**
+   * - Prior to Kotlin 2.3.20, top-level function injection is only compatible with jvm/android
+   *   targets.
+   * - Top-level function injection is not yet compatible with incremental compilation on any
+   *   platform
    */
+  @DelicateMetroGradleApi(
+    "Top-level function injection is experimental and does not work yet in all cases. See the kdoc."
+  )
   public val enableTopLevelFunctionInjection: Property<Boolean> =
     objects.property(Boolean::class.javaObjectType).convention(false)
 
@@ -66,11 +79,45 @@ constructor(layout: ProjectLayout, objects: ObjectFactory, providers: ProviderFa
     objects.property(Boolean::class.javaObjectType)
 
   /**
-   * Enable/disable contribution hint generation in FIR for JVM compilations types. Disabled by
-   * default. Requires [generateContributionHints] to be true
+   * Enable/disable contribution hint generation in FIR. Disabled by default as this is still
+   * experimental. Requires [generateContributionHints] to be true.
+   *
+   * **Warnings**
+   * - Prior to Kotlin 2.3.20, FIR contribution hint gen is only compatible with jvm/android
+   *   targets.
+   * - FIR contribution hint gen is not yet compatible with incremental compilation on any platform
    */
-  public val generateJvmContributionHintsInFir: Property<Boolean> =
+  @DelicateMetroGradleApi(
+    "FIR contribution hint gen is experimental and does not work yet in all cases. See the kdoc."
+  )
+  public val generateContributionHintsInFir: Property<Boolean> =
     objects.property(Boolean::class.javaObjectType).convention(false)
+
+  /**
+   * Sets the platforms for which contribution hints will be generated. If not set, defaults are
+   * computed per-platform and per Kotlin version based on known compatible combinations.
+   *
+   * **Warnings** Prior to Kotlin 2.3.20, contribution hint gen is
+   * - ...only compatible with jvm/android targets.
+   * - ...does not support incremental compilation on any targets.
+   */
+  @DelicateMetroGradleApi(
+    "Contribution hint gen does not work yet in all platforms on all Kotlin versions. See the kdoc."
+  )
+  public val supportedHintContributionPlatforms: SetProperty<KotlinPlatformType> =
+    objects
+      .setProperty(KotlinPlatformType::class.javaObjectType)
+      .convention(
+        providers.provider {
+          if (baseKotlinVersion >= KotlinVersions.kotlin2320) {
+            // Kotlin 2.3.20, all platforms are supported
+            KotlinPlatformType.entries.toSet()
+          } else {
+            // Only jvm/android work prior to Kotlin 2.3.20
+            setOf(KotlinPlatformType.common, KotlinPlatformType.jvm, KotlinPlatformType.androidJvm)
+          }
+        }
+      )
 
   /**
    * Enable/disable full validation of bindings. If enabled, _all_ declared `@Provides` and `@Binds`

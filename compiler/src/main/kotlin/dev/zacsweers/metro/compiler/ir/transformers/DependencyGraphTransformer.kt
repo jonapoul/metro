@@ -61,6 +61,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrOverridableDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -145,6 +146,13 @@ internal class DependencyGraphTransformer(
       ?: super.visitCall(expression)
   }
 
+  override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+    if (options.generateContributionHintsInFir) {
+      contributionHintIrTransformer.visitFunction(declaration)
+    }
+    return super.visitSimpleFunction(declaration)
+  }
+
   override fun visitClassNew(declaration: IrClass): IrStatement {
     val shouldNotProcess =
       declaration.isLocal ||
@@ -160,8 +168,7 @@ internal class DependencyGraphTransformer(
     // TODO can we eagerly check for known metro types and skip?
     // Native/WASM/JS compilation hint gen can't be done in IR
     // https://youtrack.jetbrains.com/issue/KT-75865
-    val generateHints =
-      options.generateContributionHints && !options.generateJvmContributionHintsInFir
+    val generateHints = options.generateContributionHints && !options.generateContributionHintsInFir
     if (generateHints) {
       contributionHintIrTransformer.visitClass(declaration)
     }
