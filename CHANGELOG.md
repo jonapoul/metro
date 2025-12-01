@@ -46,7 +46,15 @@ Changelog
 - **Removed**: Removed deprecated `includeAnvil` Gradle DSL function.
 - **Removed**: Removed deprecated `ContributesGraphExtension` annotation.
 - **Removed**: Removed deprecated `OptionalDependency` annotation.
-- [gradle] Mark `metro.reportsDestination` as delicate/opt-in.
+
+Special thanks to the following contributors for contributing to this release!
+
+- [@yschimke](https://github.com/yschimke)
+- [@jonapoul](https://github.com/jonapoul)
+- [@kevinguitar](https://github.com/kevinguitar)
+- [@jonamireh](https://github.com/jonamireh)
+- [@zsmb13](https://github.com/zsmb13)
+- [@bjdodson](https://github.com/bjdodson)
 
 0.7.7
 -----
