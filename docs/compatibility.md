@@ -6,6 +6,7 @@ Starting with Metro `0.6.9`, Metro tries to support forward compatibility on a b
 
 | Kotlin version | Metro versions (inclusive) | Notes                                |
 |----------------|----------------------------|--------------------------------------|
+| 2.3.0-RC       | 0.6.9, 0.6.11 -            | Reporting doesn't work until `0.7.3` |
 | 2.3.0-Beta2    | 0.6.9, 0.6.11 -            | Reporting doesn't work until `0.7.3` |
 | 2.3.0-Beta1    | 0.6.9, 0.6.11 -            |                                      |
 | 2.2.21         | 0.6.6 -                    |                                      |
