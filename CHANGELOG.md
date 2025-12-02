@@ -4,6 +4,8 @@ Changelog
 **Unreleased**
 --------------
 
+- **New**: Experimental support for Kotlin `2.3.20` dev builds. See the [compatibility docs](https://zacsweers.github.io/metro/latest/compatibility/) for tested versions.
+
 0.8.0
 -----
 
