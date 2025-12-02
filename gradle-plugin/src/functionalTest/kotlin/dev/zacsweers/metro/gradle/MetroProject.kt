@@ -5,8 +5,13 @@ package dev.zacsweers.metro.gradle
 import com.autonomousapps.kit.AbstractGradleProject
 import com.autonomousapps.kit.GradleProject
 import com.autonomousapps.kit.GradleProject.DslKind
+import com.autonomousapps.kit.RootProject
 import com.autonomousapps.kit.Source
 import com.autonomousapps.kit.gradle.BuildScript
+import com.autonomousapps.kit.gradle.DependencyResolutionManagement
+import com.autonomousapps.kit.gradle.PluginManagement
+import com.autonomousapps.kit.gradle.Repositories
+import com.autonomousapps.kit.gradle.Repository
 
 abstract class MetroProject(
   private val debug: Boolean = false,
@@ -24,8 +29,26 @@ abstract class MetroProject(
         .withRootProject {
           sources = this@MetroProject.sources()
           withBuildScript { applyMetroDefault() }
+          withMetroSettings()
         }
         .write()
+
+  protected fun RootProject.Builder.withMetroSettings() = apply {
+    withSettingsScript {
+      pluginManagement = PluginManagement(metroRepositories(Repository.DEFAULT_PLUGINS))
+      dependencyResolutionManagement =
+        DependencyResolutionManagement(metroRepositories(Repository.DEFAULT))
+    }
+  }
+
+  private fun metroRepositories(defaults: List<Repository>): Repositories =
+    Repositories(
+      mutableListOf<Repository>().apply {
+        addAll(defaults)
+        add(Repository.ofMaven("https://packages.jetbrains.team/maven/p/kt/dev/"))
+        add(Repository.ofMaven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies/"))
+      }
+    )
 
   /** Generates just the `metro { ... }` block content for use in custom build scripts. */
   fun buildMetroBlock(): String = buildString {

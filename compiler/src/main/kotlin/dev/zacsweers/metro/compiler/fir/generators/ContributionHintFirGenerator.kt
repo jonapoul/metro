@@ -120,7 +120,7 @@ internal class ContributionHintFirGenerator(session: FirSession, compatContext: 
             valueParameter(Symbols.Names.contributed, { contributingClass.constructType(it) })
           }
           .apply { markAsDeprecatedHidden(session) }
-          .symbol
+          .symbol as FirNamedFunctionSymbol
       }
   }
 

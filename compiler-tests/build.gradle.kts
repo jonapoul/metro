@@ -11,6 +11,7 @@ plugins {
 sourceSets {
   register("generator220")
   register("generator230")
+  register("generator2320")
 }
 
 val testCompilerVersionProvider = providers.gradleProperty("metro.testCompilerVersion")
@@ -65,14 +66,12 @@ dependencies {
 
   val generatorConfigToUse: String
 
-  if (testKotlinVersion >= KotlinVersion(2, 3)) {
+  if (testKotlinVersion >= KotlinVersion(2, 3, 20)) {
+    generatorConfigToUse = "generator2320"
+    compilerTestFrameworkVersion = testCompilerVersion
+  } else if (testKotlinVersion >= KotlinVersion(2, 3)) {
     generatorConfigToUse = "generator230"
-    compilerTestFrameworkVersion =
-      if (testCompilerVersion.contains("-dev")) {
-        "2.3.0-Beta2"
-      } else {
-        testCompilerVersion
-      }
+    compilerTestFrameworkVersion = testCompilerVersion
   } else {
     generatorConfigToUse = "generator220"
     compilerTestFrameworkVersion = libs.versions.kotlin.get()
@@ -82,6 +81,9 @@ dependencies {
   "generator220CompileOnly"(libs.kotlin.compilerTestFramework)
   "generator230CompileOnly"(
     "org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:$compilerTestFrameworkVersion"
+  )
+  "generator2320CompileOnly"(
+    "org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:2.3.20-dev-5437"
   )
 
   testImplementation(sourceSets.named(generatorConfigToUse).map { it.output })
